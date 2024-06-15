@@ -1,0 +1,15 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../dist/server",
+    "module": "commonjs",
+    "skipLibCheck": true,
+    "noPropertyAccessFromIndexSignature": false,
+    "strictPropertyInitialization": true,
+    "emitDecoratorMetadata": true,
+    "baseUrl": "./",
+    "paths": {
+      "@server/*": ["*"]
+    }
+  }
+}
