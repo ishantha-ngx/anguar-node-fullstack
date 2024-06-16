@@ -22,7 +22,6 @@ export class AuthService extends BaseService<Auth> implements IAuthService {
 
   //   Login
   login = async (payload: LoginPayload): Promise<AuthDTO> => {
-    console.log(payload);
     const { username, email, password } = payload;
     const auth = await this.repository
       .createQueryBuilder('auth')
@@ -30,8 +29,6 @@ export class AuthService extends BaseService<Auth> implements IAuthService {
       .where('user.email = :email', { email })
       .orWhere('auth.username = :username', { username })
       .getOne();
-
-    console.log(auth);
 
     if (!auth) {
       throw new BadRequestError({
@@ -77,8 +74,6 @@ export class AuthService extends BaseService<Auth> implements IAuthService {
 
         // TODO: Send confirmation email
         // await AuthController.sendConfirmationEmail(user);
-
-        console.log(user);
 
         // Generate auth token
         const tokens = Encrypt.generateToken(user);

@@ -1,0 +1,20 @@
+import { userController } from '@server/controllers';
+import { asyncErrorHandler } from '@server/middlewares';
+import {
+  userLoginValidation,
+  userRegistrationValidation,
+} from '@server/validation';
+import { Router } from 'express';
+
+const router = Router();
+
+// Auth
+router
+  .route('/login')
+  .post(userLoginValidation, asyncErrorHandler(userController.login));
+router
+  .route('/register')
+  .post(userRegistrationValidation, asyncErrorHandler(userController.register));
+router.route('/refresh').post(asyncErrorHandler(userController.refreshToken));
+
+export default router;

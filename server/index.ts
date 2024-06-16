@@ -8,28 +8,29 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import helmet from 'helmet';
 import { errorHandler, handleLoging } from '@server/middlewares';
-import setRoutes from './routes';
 import { AppDataSource } from './config';
+import router from '@server/routes';
 
+const { PORT = 3000 } = process.env;
+
+const app = express();
+
+app.use(express.json());
+app.use(morgan('dev'));
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+app.use(cors());
+app.use(helmet());
+
+// Apply the routes to our application with the prefix /api
+app.use('/api', router);
+
+// Error handling
+app.use(errorHandler);
+
+// Initialiye Database
 AppDataSource.initialize()
   .then(() => {
-    const { PORT = 3000 } = process.env;
-
-    const app = express();
-
-    app.use(express.json());
-    app.use(morgan('dev'));
-    app.use(express.urlencoded({ extended: true }));
-    app.use(cookieParser());
-    app.use(cors());
-    app.use(helmet());
-
-    // Set app routes
-    setRoutes(app);
-
-    // Error handling
-    app.use(errorHandler);
-
     return app.listen(PORT, async () => {
       console.log(`Server is listening on port ${PORT}`);
     });
