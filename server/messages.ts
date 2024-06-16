@@ -6,9 +6,17 @@ const messages = {
     badRequest: 'Bad request',
     internalServerError: 'Something went wrong',
     authenticationFailed: 'The email or password you entered is incorrect',
+    auth: {
+      missing: 'Missing authentication',
+      notLoggedIn: 'You are not logged in',
+    },
     user: {
       notActive: 'Your account is not activated yet. Please confirm the email',
       blocked: 'Your user account is blocked. Please contact administrator',
+    },
+    token: {
+      expired: 'Token expired',
+      invalid: 'Invalid token',
     },
   },
 

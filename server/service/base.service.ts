@@ -1,15 +1,12 @@
 import { AppBaseEntity } from '@server/entities/_AppBaseEntity';
 import {
-  DataSource,
   DeepPartial,
   DeleteResult,
   Equal,
   FindManyOptions,
   FindOneOptions,
-  ObjectLiteral,
   Repository,
 } from 'typeorm';
-import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 
 export interface IBaseService<T> {
   findOne(options: FindOneOptions<T>): Promise<T | null>;

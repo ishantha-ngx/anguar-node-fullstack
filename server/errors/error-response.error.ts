@@ -2,8 +2,8 @@ import { StatusCodes } from 'http-status-codes';
 import messages from '@server/messages';
 import { CustomError, ERROR_TYPES } from './custom.error';
 
-// Bad Request Error
-export class BadRequestError extends CustomError {
+// Generic Error Response
+export class ErrorResponse extends CustomError {
   override type: ERROR_TYPES = 'ERROR';
   private static readonly _statusCode = StatusCodes.BAD_REQUEST;
   private readonly _code: number;
@@ -19,12 +19,12 @@ export class BadRequestError extends CustomError {
     const { code, message, logging } = params || {};
 
     super(message || messages.error.badRequest);
-    this._code = code || BadRequestError._statusCode;
+    this._code = code || ErrorResponse._statusCode;
     this._logging = logging || false;
     this._context = params?.context || {};
 
     // Only because we are extending a built in class
-    Object.setPrototypeOf(this, BadRequestError.prototype);
+    Object.setPrototypeOf(this, ErrorResponse.prototype);
   }
 
   get response() {

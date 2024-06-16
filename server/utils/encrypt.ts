@@ -1,8 +1,9 @@
 import * as jwt from 'jsonwebtoken';
 import * as bcrypt from 'bcrypt';
 import { User } from '@server/entities';
-import { BadRequestError } from '@server/errors';
+import { ErrorResponse } from '@server/errors';
 import { StatusCodes } from 'http-status-codes';
+import messages from '@server/messages';
 
 export class Encrypt {
   private static readonly jwtTokenSecret: jwt.Secret = process.env
@@ -29,14 +30,14 @@ export class Encrypt {
       return jwt.verify(token, publicKey);
     } catch (error) {
       if (!isRefreshToken && error instanceof jwt.TokenExpiredError) {
-        throw new BadRequestError({
+        throw new ErrorResponse({
           code: StatusCodes.UNAUTHORIZED,
-          message: 'Token expired',
+          message: messages.error.token.expired,
         });
       }
-      throw new BadRequestError({
+      throw new ErrorResponse({
         code: StatusCodes.FORBIDDEN,
-        message: 'Invalid token',
+        message: messages.error.token.invalid,
       });
     }
   }

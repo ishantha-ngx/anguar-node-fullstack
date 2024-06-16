@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { IUserService, UserService } from '@server/service';
 import { Encrypt, checkUserStatus } from '@server/utils';
-import { BadRequestError } from '@server/errors';
+import { ErrorResponse } from '@server/errors';
 import { Equal } from 'typeorm';
 import { User } from '@server/entities';
 import messages from '@server/messages';
@@ -23,9 +23,9 @@ export const auth = async (
   const access_token = req.cookies?.access_token;
   if (!access_token) {
     next(
-      new BadRequestError({
+      new ErrorResponse({
         code: StatusCodes.UNAUTHORIZED,
-        message: 'You are not logged in',
+        message: messages.error.auth.notLoggedIn,
       })
     );
   } else if (typeof access_token !== 'undefined') {
@@ -38,7 +38,7 @@ export const auth = async (
       });
 
       if (!user) {
-        throw new BadRequestError({
+        throw new ErrorResponse({
           code: StatusCodes.UNAUTHORIZED,
           message: messages.error.authenticationFailed,
         });
@@ -54,9 +54,9 @@ export const auth = async (
     }
   } else {
     next(
-      new BadRequestError({
+      new ErrorResponse({
         code: StatusCodes.UNAUTHORIZED,
-        message: 'Missing authentication',
+        message: messages.error.auth.missing,
       })
     );
   }

@@ -1,7 +1,7 @@
 import { LoginPayload, RegisterPayload } from '../payloads/user.payload';
 import { StatusCodes } from 'http-status-codes';
 import { Equal } from 'typeorm';
-import { BadRequestError } from '@server/errors';
+import { ErrorResponse } from '@server/errors';
 import { AuthDTO } from '@server/dto';
 import { Auth, RefreshToken, User } from '@server/entities';
 import { Encrypt, checkUserStatus } from '@server/utils';
@@ -35,7 +35,7 @@ export class AuthService extends BaseService<Auth> implements IAuthService {
       .getOne();
 
     if (!auth) {
-      throw new BadRequestError({
+      throw new ErrorResponse({
         code: StatusCodes.UNAUTHORIZED,
         message: messages.error.authenticationFailed,
       });
@@ -43,7 +43,7 @@ export class AuthService extends BaseService<Auth> implements IAuthService {
 
     const isPasswordValid = Encrypt.comparepassword(auth.password, password);
     if (!isPasswordValid) {
-      throw new BadRequestError({
+      throw new ErrorResponse({
         code: StatusCodes.UNAUTHORIZED,
         message: messages.error.authenticationFailed,
       });
@@ -104,17 +104,17 @@ export class AuthService extends BaseService<Auth> implements IAuthService {
       });
 
     if (!refreshTokenEntity) {
-      throw new BadRequestError({
+      throw new ErrorResponse({
         code: StatusCodes.FORBIDDEN,
-        message: 'Invalid token',
+        message: messages.error.token.invalid,
       });
     }
 
     if (refreshTokenEntity.expiryDate < new Date()) {
       await this.refreshTokenReposotory.remove(refreshTokenEntity);
-      throw new BadRequestError({
+      throw new ErrorResponse({
         code: StatusCodes.FORBIDDEN,
-        message: 'Invalid token',
+        message: messages.error.token.invalid,
       });
     }
 
