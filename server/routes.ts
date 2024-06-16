@@ -1,5 +1,5 @@
 import { Router, Application } from 'express';
-import { asyncErrorHandler } from '@server/middlewares';
+import { asyncErrorHandler, auth } from '@server/middlewares';
 import { userController } from '@server/controllers';
 import { UrlNotFoundError } from '@server/errors';
 import { userLoginValidation, userRegistrationValidation } from './validation';
@@ -17,12 +17,14 @@ const setRoutes = (app: Application): void => {
       userRegistrationValidation,
       asyncErrorHandler(userController.register)
     );
-  router.route('/auth/refresh').post(asyncErrorHandler(userController.refresh));
+  router
+    .route('/auth/refresh')
+    .post(asyncErrorHandler(userController.refreshToken));
 
-  // Users
-  router.route('/users').get(asyncErrorHandler(userController.getAll)); // auth,
-  router.route('/user').post(asyncErrorHandler(userController.insert));
-  router.route('/user/:id').get(asyncErrorHandler(userController.get));
+  // Users Routes
+  router.route('/users').get(auth, asyncErrorHandler(userController.getAll));
+  router.route('/user').post(asyncErrorHandler(userController.create));
+  router.route('/user/:id').get(asyncErrorHandler(userController.getById));
   router.route('/user/:id').put(asyncErrorHandler(userController.update));
   router.route('/user/:id').delete(asyncErrorHandler(userController.delete));
 

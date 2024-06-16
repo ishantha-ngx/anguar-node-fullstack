@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { CustomError, MultipleCustomError } from '@server/errors';
 import messages from '@server/messages';
+import { isProdEnv } from '@server/config';
 
 // Handle log
 export const handleLoging = (log: Object) => {
@@ -23,12 +24,13 @@ export const errorHandler = (
   next: NextFunction
 ) => {
   // Handled errors
+  handleLoging(err);
   const isCustomErrorInstance = err instanceof CustomError;
   const isMultipleCustomErrorInstance = err instanceof MultipleCustomError;
+
   if (isCustomErrorInstance || isMultipleCustomErrorInstance) {
     const { statusCode, logging, response } = err;
 
-    handleLoging(err);
     const responseObj = isCustomErrorInstance
       ? {
           error: response,
@@ -57,7 +59,7 @@ export const errorHandler = (
     statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
     error: {
       message: messages.error.internalServerError,
-      details: err,
+      ...(!isProdEnv ? { details: err } : {}),
     },
   });
 };

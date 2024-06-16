@@ -1,13 +1,11 @@
 import {
-  Entity,
-  Column,
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  BaseEntity,
 } from 'typeorm';
 
-@Entity()
-export class Base {
+export abstract class AppBaseEntity extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
@@ -16,4 +14,6 @@ export class Base {
 
   @UpdateDateColumn()
   updatedAt?: Date;
+
+  abstract toDTO<T>(...args: any[]): T;
 }

@@ -1,31 +1,31 @@
 import { User } from '@server/entities';
 
 // User Response
-export class UserResponce {
-  id: string;
-  email: string;
-  name: string;
-  isAdmin: boolean;
+export class UserDTO {
+  id!: string;
+  email!: string;
+  firstName!: string;
+  lastName!: string;
 
-  constructor(user: User) {
-    this.id = user.id;
-    this.email = user.email;
-    this.name = user.email;
-    this.isAdmin = Boolean(user.isAdmin);
-  }
+  // constructor(user: User) {
+  //   this.id = user.id;
+  //   this.email = user.email;
+  //   this.firstName = user.firstName;
+  //   this.lastName = user.lastName;
+  // }
 }
 
 // Auth Response
-export class AuthResponse {
-  user: UserResponce;
-  accessToken: string;
-  refreshToken: string;
+export class AuthDTO {
+  user!: UserDTO;
+  accessToken!: string;
+  refreshToken!: string;
 
   constructor(
     user: User,
     token: { accessToken: string; refreshToken: string }
   ) {
-    this.user = new UserResponce(user);
+    this.user = user.toDTO();
     this.accessToken = token.accessToken;
     this.refreshToken = token.refreshToken;
   }

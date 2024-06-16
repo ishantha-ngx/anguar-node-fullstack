@@ -1,55 +1,69 @@
-import { IBaseModel } from '@server/models';
+import { AppDataSource } from '@server/config';
+import { AppBaseEntity } from '@server/entities/_AppBaseEntity';
+import messages from '@server/messages';
+import { BaseService } from '@server/service';
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
+import { FindOneOptions, ObjectType } from 'typeorm';
 
-abstract class BaseController<T> {
-  model: T & IBaseModel<T>;
-  parseDTO: any;
+export abstract class BaseController<T extends AppBaseEntity> {
+  protected service: BaseService<T>;
+  protected responseType?: any;
 
-  constructor({ model, dto }: { model: any; dto?: any }) {
-    this.model = new model() as T & IBaseModel<T>;
-    this.parseDTO = (obj: any) => {
-      return dto ? new dto(obj) : obj;
-    };
+  constructor(entityClass: ObjectType<T>, responseType?: any) {
+    this.service = new BaseService<T>(AppDataSource.getRepository(entityClass));
+    this.responseType = responseType;
   }
 
-  // Get all
-  getAll = async (req: Request, res: Response) => {
-    let allRecords = await this.model.getAll();
-    allRecords = allRecords.map((record: any) => this.parseDTO(record));
-    return res.status(StatusCodes.OK).json(allRecords);
+  getAll = async (req: Request, res: Response): Promise<void> => {
+    const entities = await this.service.findAll();
+    const dtos = await Promise.all(
+      entities.map((entity: T) => this.service.toDTO(entity))
+    );
+    res.status(StatusCodes.OK).json(dtos);
   };
 
-  // Count all
-  count = async (req: Request, res: Response) => {
-    let count = await this.model.count();
-    return res.status(StatusCodes.OK).json(count);
+  getById = async (req: Request, res: Response): Promise<void> => {
+    const entity = await this.service.findById(req.params.id);
+    if (!entity) {
+      res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ error: messages.error.notFound });
+      return;
+    }
+    const dto = await this.service.toDTO(entity, true);
+    res.status(StatusCodes.OK).json(dto);
   };
 
-  // Get by id
-  get = async (req: Request, res: Response) => {
-    const record = await this.model.getById(req.params.id);
-    return res.status(StatusCodes.OK).json(this.parseDTO(record));
+  create = async (req: Request, res: Response): Promise<void> => {
+    const createdEntity = await this.service.create(req.body);
+    const dto = await this.service.toDTO(createdEntity);
+    res.status(StatusCodes.CREATED).json(dto);
   };
 
-  // Insert
-  insert = async (req: Request, res: Response) => {
-    const obj = await this.model.insert(req.body);
-    return res.status(StatusCodes.CREATED).json(this.parseDTO(obj));
+  update = async (req: Request, res: Response): Promise<void> => {
+    const updatedEntity = await this.service.update(
+      { id: req.params.id } as FindOneOptions<T>,
+      req.body
+    );
+    if (!updatedEntity) {
+      res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ error: messages.error.notFound });
+      return;
+    }
+    const dto = await this.service.toDTO(updatedEntity);
+    res.status(StatusCodes.OK).json(dto);
   };
 
-  // Update by id
-  update = async (req: Request, res: Response) => {
-    const obj = await this.model.update(req.params.id, req.body);
-    return res.status(StatusCodes.OK).json(this.parseDTO(obj));
-  };
-
-  // Delete by id
-  delete = async (req: Request, res: Response) => {
-    const obj = await this.model.delete(req.params.id);
-    console.log(obj);
-    return res.status(200).json(this.parseDTO(obj));
+  delete = async (req: Request, res: Response): Promise<void> => {
+    const result = await this.service.delete(req.params.id);
+    if (!result) {
+      res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ error: messages.error.notFound });
+      return;
+    }
+    res.status(StatusCodes.NO_CONTENT).send();
   };
 }
-
-export default BaseController;

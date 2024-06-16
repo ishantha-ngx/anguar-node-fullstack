@@ -1,12 +1,13 @@
+import 'module-alias/register';
 import * as dotevnv from 'dotenv';
-import morgan from 'morgan';
 dotevnv.config();
 
 import express from 'express';
+import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import helmet from 'helmet';
-import { errorHandler, handleLoging } from './middlewares';
+import { errorHandler, handleLoging } from '@server/middlewares';
 import setRoutes from './routes';
 import { AppDataSource } from './config';
 
