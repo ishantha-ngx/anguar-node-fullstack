@@ -6,6 +6,10 @@ const messages = {
     badRequest: 'Bad request',
     internalServerError: 'Something went wrong',
     authenticationFailed: 'The email or password you entered is incorrect',
+    user: {
+      notActive: 'Your account is not activated yet. Please confirm the email',
+      blocked: 'Your user account is blocked. Please contact administrator',
+    },
   },
 
   validations: {

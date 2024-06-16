@@ -3,3 +3,4 @@ export * from './EmailConfirmation.entity';
 export * from './Permission.entity';
 export * from './Role.entity';
 export * from './User.entity';
+export * from './RefreshToken.entity';

@@ -5,13 +5,21 @@ import {
   Permission,
   Role,
   User,
+  RefreshToken,
 } from '@server/entities';
 import { DataSource } from 'typeorm';
 
 const { DB_USER, DB_HOST, DB_NAME, DB_PASSWORD, DB_PORT } = process.env;
 
 const port = DB_PORT as number | undefined;
-const entities = [Auth, EmailConfirmation, Permission, Role, User];
+const entities = [
+  Auth,
+  EmailConfirmation,
+  Permission,
+  Role,
+  User,
+  RefreshToken,
+];
 
 export const AppDataSource = new DataSource({
   type: 'postgres',

@@ -1,6 +1,7 @@
 import { userController } from '@server/controllers';
 import { asyncErrorHandler } from '@server/middlewares';
 import {
+  refreshTokenValidation,
   userLoginValidation,
   userRegistrationValidation,
 } from '@server/validation';
@@ -15,6 +16,8 @@ router
 router
   .route('/register')
   .post(userRegistrationValidation, asyncErrorHandler(userController.register));
-router.route('/refresh').post(asyncErrorHandler(userController.refreshToken));
+router
+  .route('/refresh')
+  .get(refreshTokenValidation, asyncErrorHandler(userController.refreshToken));
 
 export default router;

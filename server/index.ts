@@ -22,7 +22,7 @@ app.use(cookieParser());
 app.use(cors());
 app.use(helmet());
 
-// Apply the routes to our application with the prefix /api
+// Apply the API routes
 app.use('/api', router);
 
 // Error handling

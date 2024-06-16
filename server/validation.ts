@@ -1,4 +1,4 @@
-import { body, validationResult } from 'express-validator';
+import { body, cookie, validationResult } from 'express-validator';
 import { Auth, User } from '@server/entities';
 import {
   AuthService,
@@ -19,13 +19,6 @@ export const runValidation = (req: any) => {
 
 // User login form validation
 const userLoginValidation = [
-  // body('email')
-  //   .trim()
-  //   .exists({ checkFalsy: true })
-  //   .withMessage(messages.validations.emailRequired)
-  //   .isEmail()
-  //   .withMessage(messages.validations.provideValidEmail),
-
   body().custom((value, { req }) => {
     if (!req.body.username && !req.body.email) {
       throw new Error(messages.validations.userNameOrEmailRequired);
@@ -99,4 +92,13 @@ const userRegistrationValidation = [
     .withMessage(messages.validations.passwordNotMatched),
 ];
 
-export { userLoginValidation, userRegistrationValidation };
+// Refresh token validator
+const refreshTokenValidation = [
+  cookie('refresh_token').exists().withMessage('Invalid cookies'),
+];
+
+export {
+  userLoginValidation,
+  userRegistrationValidation,
+  refreshTokenValidation,
+};

@@ -1,25 +1,26 @@
 import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { IUserService, UserService } from '@server/service';
-import { Encrypt } from '@server/utils';
+import { Encrypt, checkUserStatus } from '@server/utils';
 import { BadRequestError } from '@server/errors';
 import { Equal } from 'typeorm';
+import { User } from '@server/entities';
+import messages from '@server/messages';
+import { UserStatus } from '@server/enums';
 
-export const auth = async (req: Request, _: Response, next: NextFunction) => {
-  let access_token;
-  console.log(req.cookies);
+export interface AuthRequest extends Request {
+  cookies: {
+    [key: string]: string;
+  };
+  user?: User;
+}
 
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith('Bearer')
-  ) {
-    access_token = req.headers.authorization.split(' ')[1];
-  } else if (req.cookies?.access_token) {
-    access_token = req.cookies?.access_token;
-  }
-
-  console.log('access_token');
-  console.log(access_token);
+export const auth = async (
+  req: AuthRequest,
+  _: Response,
+  next: NextFunction
+) => {
+  const access_token = req.cookies?.access_token;
   if (!access_token) {
     next(
       new BadRequestError({
@@ -28,25 +29,29 @@ export const auth = async (req: Request, _: Response, next: NextFunction) => {
       })
     );
   } else if (typeof access_token !== 'undefined') {
-    console.log('XXX');
-    const verify = Encrypt.verifyToken(access_token, false);
-    console.log(verify);
+    try {
+      // Verify token
+      const verify = Encrypt.verifyToken(access_token, false);
 
-    const user = await (new UserService() as IUserService).findOne({
-      where: { id: Equal(verify?.sub as string) },
-    });
-    //   const auth = await authService.get({
-    //     user_id: Number(verify?.sub),
-    //   });
+      const user = await (new UserService() as IUserService).findOne({
+        where: { id: Equal(verify?.sub as string) },
+      });
 
-    //   if (!(auth && auth.length)) {
-    //     throw new BadRequestError({
-    //       code: StatusCodes.UNAUTHORIZED,
-    //       message: 'Invalid token',
-    //     });
-    //   }
-    (req as any)['user'] = user;
-    next();
+      if (!user) {
+        throw new BadRequestError({
+          code: StatusCodes.UNAUTHORIZED,
+          message: messages.error.authenticationFailed,
+        });
+      }
+
+      // Check valid user status
+      checkUserStatus(user);
+
+      req.user = user;
+      next();
+    } catch (error) {
+      next(error);
+    }
   } else {
     next(
       new BadRequestError({

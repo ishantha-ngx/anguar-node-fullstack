@@ -78,9 +78,13 @@ class UserController extends BaseController<User> {
   };
 
   // Refresh token
-  refreshToken = async (req: Request<RegisterPayload>, res: Response) => {
+  refreshToken = async (req: Request, res: Response) => {
     // runValidation(req);
-    const authResponse: AuthDTO = await this.authService.login(req.body);
+
+    const refreshToken = req.cookies?.refresh_token;
+    const authResponse: AuthDTO = await this.authService.refreshToken(
+      refreshToken
+    );
     return res.status(StatusCodes.OK).json(authResponse);
   };
 }

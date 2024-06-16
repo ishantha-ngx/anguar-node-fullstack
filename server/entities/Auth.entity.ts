@@ -10,7 +10,7 @@ import bcrypt from 'bcryptjs';
 import { AppBaseEntity } from './_AppBaseEntity';
 import { EmailConfirmation } from './EmailConfirmation.entity';
 import { User } from './User.entity';
-import { AuthDTO } from '@server/dto';
+import { RefreshToken } from './RefreshToken.entity';
 
 @Entity()
 @Index(['username'], { unique: true })
@@ -34,11 +34,19 @@ export class Auth extends AppBaseEntity {
   )
   emailConfirmationTokens?: EmailConfirmation[];
 
+  @OneToMany(
+    () => RefreshToken,
+    (refreshToken: RefreshToken) => refreshToken.auth
+  )
+  refreshTokens?: RefreshToken[];
+
+  // Set Hash Password
   async setHashPassword(password: string) {
     this.passwordSalt = bcrypt.genSaltSync();
     this.password = bcrypt.hashSync(password, this.passwordSalt);
   }
 
+  // Compare Password
   async validatePassword(password: string) {
     return bcrypt.compare(password, this.password);
   }

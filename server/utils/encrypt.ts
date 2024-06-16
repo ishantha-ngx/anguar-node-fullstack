@@ -1,52 +1,57 @@
 import * as jwt from 'jsonwebtoken';
 import * as bcrypt from 'bcrypt';
 import { User } from '@server/entities';
+import { BadRequestError } from '@server/errors';
+import { StatusCodes } from 'http-status-codes';
 
 export class Encrypt {
-  static async encryptpass(password: string) {
-    return bcrypt.hashSync(password, 12);
-  }
+  private static readonly jwtTokenSecret: jwt.Secret = process.env
+    .JWT_SECRET as string;
+  private static readonly jwtTokenExpire: string = `${
+    process.env.JWT_EXPIRE as string
+  }h`; // JWT in hours
+  private static readonly refreshTokenSecret: jwt.Secret = process.env
+    .REFRESH_JWT_SECRET as string;
+  private static readonly refreshTokenExpire: string = `${
+    process.env.REFRESH_JWT_EXPIRE as string
+  }h`; // JWT REFRESH TOKEN in hours
+
   static comparepassword(hashPassword: string, password: string) {
     return bcrypt.compareSync(password, hashPassword);
   }
 
+  // Verify JWT token
   static verifyToken(token: string, isRefreshToken: boolean) {
-    const accessTokenSecret: jwt.Secret = process.env
-      .ACESS_TOKEN_SECRET as string;
-    const refreshTokenSecret: jwt.Secret = process.env
-      .REFRESH_TOKEN_SECRET as string;
-
-    if (isRefreshToken) {
-      return jwt.verify(token, refreshTokenSecret!);
-    } else {
-      return jwt.verify(token, accessTokenSecret!);
+    try {
+      const publicKey = isRefreshToken
+        ? this.refreshTokenSecret
+        : this.jwtTokenSecret;
+      return jwt.verify(token, publicKey);
+    } catch (error) {
+      if (!isRefreshToken && error instanceof jwt.TokenExpiredError) {
+        throw new BadRequestError({
+          code: StatusCodes.UNAUTHORIZED,
+          message: 'Token expired',
+        });
+      }
+      throw new BadRequestError({
+        code: StatusCodes.FORBIDDEN,
+        message: 'Invalid token',
+      });
     }
   }
 
+  // Generate JWT token
   static generateToken(user: User): {
     accessToken: string;
     refreshToken: string;
   } {
-    const accessTokenSecret: jwt.Secret = process.env
-      .ACESS_TOKEN_SECRET as string;
-    const refreshTokenSecret: jwt.Secret = process.env
-      .REFRESH_TOKEN_SECRET as string;
-
-    const accessTokenPrivateKey = Buffer.from(
-      accessTokenSecret,
-      'base64'
-    ).toString('ascii');
-    const refreshTokenPrivateKey = Buffer.from(
-      refreshTokenSecret,
-      'base64'
-    ).toString('ascii');
-
-    const accessToken = jwt.sign({ sub: user.id }, accessTokenPrivateKey, {
-      expiresIn: '1d',
+    const accessToken = jwt.sign({ sub: user.id }, this.jwtTokenSecret, {
+      expiresIn: this.jwtTokenExpire,
     });
 
-    const refreshToken = jwt.sign({ sub: user.id }, refreshTokenPrivateKey, {
-      expiresIn: '1d',
+    const refreshToken = jwt.sign({ sub: user.id }, this.refreshTokenSecret, {
+      expiresIn: this.refreshTokenExpire,
     });
 
     return { accessToken, refreshToken };
