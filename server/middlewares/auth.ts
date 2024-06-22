@@ -6,7 +6,6 @@ import { ErrorResponse } from '@server/errors';
 import { Equal } from 'typeorm';
 import { User } from '@server/entities';
 import messages from '@server/messages';
-import { UserStatus } from '@server/enums';
 
 export interface AuthRequest extends Request {
   cookies: {
@@ -34,7 +33,7 @@ export const auth = async (
       const verify = Encrypt.verifyToken(access_token, false);
 
       const user = await (new UserService() as IUserService).findOne({
-        where: { id: Equal(verify?.sub as string) },
+        where: { id: Equal(parseInt(verify?.sub as string)) },
       });
 
       if (!user) {
