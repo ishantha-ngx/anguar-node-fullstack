@@ -19,5 +19,8 @@ router
 router
   .route('/refresh')
   .get(refreshTokenValidation, asyncErrorHandler(userController.refreshToken));
+router
+  .route('/confirm-email/:token')
+  .get(asyncErrorHandler(userController.confirmEmailAddress));
 
 export default router;

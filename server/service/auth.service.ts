@@ -1,13 +1,24 @@
 import { LoginPayload, RegisterPayload } from '../payloads/user.payload';
 import { StatusCodes } from 'http-status-codes';
 import { Equal } from 'typeorm';
+import { v4 as uuidv4 } from 'uuid';
 import { ErrorResponse } from '@server/errors';
 import { AuthDTO } from '@server/dto';
-import { Auth, RefreshToken, User } from '@server/entities';
-import { Encrypt, checkUserStatus } from '@server/utils';
+import { Auth, EmailConfirmation, RefreshToken, User } from '@server/entities';
+import {
+  EmailSender,
+  Encrypt,
+  checkUserStatus,
+  emailContentTemplate,
+  emailSubjects,
+  emailUrls,
+  noReplyEmail,
+  replacePlaceholders,
+} from '@server/utils';
 import messages from '@server/messages';
 import { AppDataSource } from '@server/config';
 import { BaseService, IBaseService } from './base.service';
+import { UserStatus } from '@server/enums';
 
 export interface IAuthService extends IBaseService<Auth> {
   login(payload: LoginPayload): Promise<AuthDTO>;
@@ -20,6 +31,8 @@ export interface IAuthService extends IBaseService<Auth> {
 export class AuthService extends BaseService<Auth> implements IAuthService {
   private readonly refreshTokenReposotory =
     AppDataSource.getRepository(RefreshToken);
+  private readonly emailConfirmationReposotory =
+    AppDataSource.getRepository(EmailConfirmation);
   constructor() {
     super(AppDataSource.getRepository(Auth));
   }
@@ -85,8 +98,15 @@ export class AuthService extends BaseService<Auth> implements IAuthService {
 
         await transactionalEntityManager.save(auth);
 
-        // TODO: Send confirmation email
-        // await AuthController.sendConfirmationEmail(user);
+        // Save email confirmation
+        const emailConfirmation = new EmailConfirmation();
+        emailConfirmation.auth = auth;
+        emailConfirmation.token = uuidv4();
+
+        await transactionalEntityManager.save(emailConfirmation);
+
+        // Send confirmation email
+        this.sendEmailConfirmationEmail(user, emailConfirmation);
 
         // Generate auth token
         const tokens = Encrypt.generateToken(user);
@@ -144,6 +164,30 @@ export class AuthService extends BaseService<Auth> implements IAuthService {
     });
   };
 
+  // Confirm email address
+  confirmEmailAddress = async (token: string): Promise<boolean> => {
+    const emailConfirmObj: EmailConfirmation | null =
+      await this.emailConfirmationReposotory.findOne({
+        where: { token: Equal(token) },
+        relations: ['auth', 'auth.user'],
+      });
+
+    if (!emailConfirmObj) {
+      throw new ErrorResponse({
+        code: StatusCodes.BAD_REQUEST,
+        message: messages.error.auth.confirmTokenInvalid,
+      });
+    }
+
+    const user = emailConfirmObj.auth.user;
+    user.emailConfirmed = true;
+    user.status = UserStatus.ACTIVE;
+    await user.save();
+
+    await this.emailConfirmationReposotory.delete({ id: emailConfirmObj.id });
+    return true;
+  };
+
   // Save refresh token in DB
   private saveRefreshToken = async (refreshToken: string, auth: Auth) => {
     const refreshTokenExpireTimeInHours = parseInt(
@@ -174,6 +218,27 @@ export class AuthService extends BaseService<Auth> implements IAuthService {
       Date.now() + refreshTokenExpireTimeInHours * 60 * 60 * 1000
     );
     return await entity.save();
+  };
+
+  // Send email confirmation email
+  private sendEmailConfirmationEmail = async (
+    user: User,
+    emailConfirmation: EmailConfirmation
+  ) => {
+    const emailSender = new EmailSender();
+    emailSender.sendEmail({
+      from: noReplyEmail,
+      to: user.email,
+      subject: emailSubjects.confirmEmail,
+      template: emailContentTemplate.confirmEmail,
+      context: {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        url: replacePlaceholders(emailUrls.confirmEmail, {
+          token: emailConfirmation.token,
+        }),
+      },
+    });
   };
 }
 

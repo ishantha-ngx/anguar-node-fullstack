@@ -6,6 +6,8 @@ import { LoginPayload, RegisterPayload } from '@server/payloads';
 import { runValidation } from '@server/validation';
 import { BaseController } from './base.controller';
 import { User } from '@server/entities';
+import { SuccessDTO } from '@server/dto/success.dto';
+import messages from '@server/messages';
 
 class UserController extends BaseController<User> {
   private readonly authService: AuthService;
@@ -66,69 +68,35 @@ class UserController extends BaseController<User> {
   };
 
   // Register
-  register = async (req: Request<RegisterPayload>, res: Response) => {
+  register = async (
+    req: Request<RegisterPayload>,
+    res: Response<SuccessDTO>
+  ) => {
     runValidation(req);
-
-    const authResponse: AuthDTO = await this.authService.register(req.body);
-
-    // TODO: Remove auto login. (Remove after email verification process)
-    // Bind coolies
-    UserController.bindResponseTokenCookies(res, authResponse);
-    return res.status(StatusCodes.OK).json(authResponse);
+    await this.authService.register(req.body);
+    return res
+      .status(StatusCodes.OK)
+      .json(new SuccessDTO(messages.success.registrationSuccess));
   };
 
   // Refresh token
   refreshToken = async (req: Request, res: Response) => {
-    // runValidation(req);
-
+    runValidation(req);
     const refreshToken = req.cookies?.refresh_token;
     const authResponse: AuthDTO = await this.authService.refreshToken(
       refreshToken
     );
     return res.status(StatusCodes.OK).json(authResponse);
   };
+
+  // Confirm email address
+  confirmEmailAddress = async (req: Request, res: Response) => {
+    const { token } = req.params;
+    await this.authService.confirmEmailAddress(token);
+    return res
+      .status(StatusCodes.OK)
+      .json(new SuccessDTO(messages.success.accountActivated));
+  };
 }
 
 export default UserController;
-
-// import { v4 as uuidv4 } from 'uuid';
-// static async sendConfirmationEmail(user: User) {
-//   const token = new EmailConfirmationToken();
-//   token.token = uuidv4();
-//   token.user = user;
-//   await token.save();
-
-//   const transporter = nodemailer.createTransport({
-//     service: 'gmail',
-//     auth: {
-//       user: 'your_email@gmail.com',
-//       pass: 'your_email_password'
-//     }
-//   });
-
-//   const mailOptions = {
-//     from: 'your_email@gmail.com',
-//     to: user.email,
-//     subject: 'Email Confirmation',
-//     text: `Please confirm your email by clicking the following link: http://localhost:3000/api/confirm/${token.token}`
-//   };
-
-//   await transporter.sendMail(mailOptions);
-// }
-
-// static async confirmEmail(req: Request, res: Response) {
-//   const { token } = req.params;
-
-//   const confirmationToken = await EmailConfirmationToken.findOne({ where: { token }, relations: ['user'] });
-//   if (!confirmationToken) {
-//     return res.status(400).json({ message: 'Invalid token' });
-//   }
-
-//   const user = confirmationToken.user;
-//   user.isEmailConfirmed = true;
-//   await user.save();
-
-//   await EmailConfirmationToken.delete({ id: confirmationToken.id });
-
-//   res.json({ message: 'Email confirmed successfully' });
-// }

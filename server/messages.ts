@@ -1,4 +1,8 @@
 const messages = {
+  success: {
+    registrationSuccess: 'Registration Successfull.',
+    accountActivated: 'Your account activated successfully.',
+  },
   error: {
     notFound: 'Not Found',
     urlNotFound: 'The Requested URL Was Not Found On This Server',
@@ -9,6 +13,7 @@ const messages = {
     auth: {
       missing: 'Missing authentication',
       notLoggedIn: 'You are not logged in',
+      confirmTokenInvalid: 'Invalid token.',
     },
     user: {
       notActive: 'Your account is not activated yet. Please confirm the email',
