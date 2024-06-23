@@ -1,0 +1,11 @@
+.header-spacer {
+  flex: 1 1 auto;
+}
+.header-menu-item {
+  padding: 0 10px;
+  cursor: pointer;
+
+  &.router-link-active {
+    color: red;
+  }
+}

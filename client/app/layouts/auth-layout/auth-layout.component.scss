@@ -1,0 +1,55 @@
+.left-section,
+.right-section {
+  height: 100%;
+  width: 100%;
+}
+
+.left-section {
+  background: url("./../../../public/images/auth-background.jpg") no-repeat;
+  background-position: top;
+  background-size: cover;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 25%;
+  text-align: center;
+
+  h1 {
+    font-size: 4rem;
+  }
+
+  h4 {
+    font-size: 1.4rem;
+  }
+
+  p {
+    font-size: 13px;
+  }
+
+  // button {
+  //   width: 100px;
+  //   color: #2c1052;
+  //   border-color: white;
+  //   margin-top: 20px;
+  //   background-color: white;
+  //   font-size: 16px;
+  //   &:hover {
+  //     background-color: rgba(255, 255, 255, 0.87);
+  //   }
+  // }
+}
+
+.right-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+
+  > .content {
+    width: 75%;
+    height: 75%;
+    padding: 20px;
+  }
+}

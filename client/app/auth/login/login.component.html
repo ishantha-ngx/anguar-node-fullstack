@@ -1,0 +1,61 @@
+<h2 class="auth-page-title">SIGN IN</h2>
+<p>Use your username and password to login with us.</p>
+<form
+  class="auth-form"
+  [formGroup]="form"
+  (ngSubmit)="submit()"
+  autocomplete="off"
+>
+  <p>
+    <mat-form-field appearance="outline">
+      <mat-label>Username</mat-label>
+      <input
+        type="text"
+        matInput
+        placeholder="Username"
+        formControlName="username"
+      />
+      @if (form.get('username')?.hasError('required')) {
+      <mat-error>Username is <strong>required</strong></mat-error>
+      }
+    </mat-form-field>
+  </p>
+
+  <p>
+    <mat-form-field appearance="outline">
+      <mat-label>Password</mat-label>
+      <input
+        type="password"
+        matInput
+        placeholder="Password"
+        formControlName="password"
+      />
+      @if (form.get('password')?.hasError('required')) {
+      <mat-error>Password is <strong>required</strong></mat-error>
+      }
+    </mat-form-field>
+  </p>
+
+  <p class="remember-me-section">
+    <mat-checkbox class="example-margin">Remember me!</mat-checkbox>
+    <a mat-button href="#">Forgot Password</a>
+  </p>
+
+  <p *ngIf="error" class="error">
+    {{ error }}
+  </p>
+
+  <div class="button">
+    <button
+      [routerLink]="['/app/dashboard']"
+      type="submit"
+      mat-stroked-button
+      extended
+    >
+      Login
+    </button>
+  </div>
+  <p class="create-account-link">
+    <a mat-button [routerLink]="['/auth/register']">CREATE ACCOUNT</a>
+  </p>
+</form>

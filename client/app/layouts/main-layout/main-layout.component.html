@@ -1,0 +1,117 @@
+<!-- Toolbar -->
+<mat-toolbar color="primary" class="header">
+  <mat-toolbar-row>
+    <span class="nav-tool-items">
+      <mat-icon (click)="sidenav.toggle()" class="hamburger">menu</mat-icon>
+    </span>
+    <div>The Brand</div>
+  </mat-toolbar-row>
+</mat-toolbar>
+
+<mat-sidenav-container>
+  <!-- Sidenav -->
+  <mat-sidenav
+    #sidenav
+    [mode]="isBiggerScreen() ? 'over' : 'side'"
+    [(opened)]="opened"
+    [fixedInViewport]="true"
+    [fixedTopGap]
+  >
+    <mat-nav-list>
+      <a mat-list-item> <mat-icon>dashboard</mat-icon> Dashboard </a>
+      <a mat-list-item> <mat-icon>person</mat-icon> User Profile </a>
+      <a mat-list-item> <mat-icon>content_paste</mat-icon> Table List </a>
+      <a mat-list-item> <mat-icon>library_books</mat-icon> Typography </a>
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <!-- Main content -->
+  <mat-sidenav-content>
+    <!-- Angular material cards -->
+    <div class="productCards">
+      <router-outlet />
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>
+
+<mat-toolbar color="primary" class="footer">
+  <mat-toolbar-row>
+    <div style="margin: 0 auto" class="mat-caption">
+      Copyright 2020. The Brand Company.
+    </div>
+  </mat-toolbar-row>
+</mat-toolbar>
+
+<!-- <div class="main-container">
+  <mat-toolbar>
+    <button
+      mat-icon-button
+      (click)="snav.toggle()"
+      class="example-icon"
+      aria-label="icon-button with menu icon"
+    >
+      <mat-icon>menu</mat-icon>
+    </button>
+    <span>My App</span>
+    <span class="example-spacer"></span>
+
+    <button
+      [matMenuTriggerFor]="profile"
+      mat-icon-button
+      class="m-r-5 p-0 d-flex jc-c align-items-center"
+    >
+      <img src="images/profile-image.png" alt="user" class="profile-pic" />
+    </button>
+    <mat-menu #profile="matMenu" class="mymegamenu">
+      <button mat-menu-item><mat-icon>settings</mat-icon> Settings</button>
+      <button mat-menu-item><mat-icon>account_box</mat-icon> Profile</button>
+      <button mat-menu-item>
+        <mat-icon>notifications_off</mat-icon> Disable notifications
+      </button>
+      <button mat-menu-item><mat-icon>exit_to_app</mat-icon> Sign Out</button>
+    </mat-menu>
+  </mat-toolbar>
+
+  <mat-sidenav-container
+    class="example-sidenav-container"
+    [style.marginTop.px]="mobileQuery.matches ? 0 : 0"
+  >
+    <mat-sidenav
+      #snav
+      id="snav"
+      class="dark-sidebar pl-xs"
+      [mode]="mobileQuery.matches ? 'side' : 'over'"
+      fixedTopGap="0"
+      [opened]="mobileQuery.matches"
+      [disableClose]="mobileQuery.matches"
+    >
+      <div class="user-profile">
+        <div class="profile-text">
+          <a [matMenuTriggerFor]="sdprofile" class="">
+            Markarn Doe <i class="ti-angle-down font-12 m-l-5"></i
+          ></a>
+        </div>
+        <mat-menu #sdprofile="matMenu" class="mymegamenu">
+          <button mat-menu-item>
+            <mat-icon fontIcon="settings"></mat-icon> Settings
+          </button>
+          <button mat-menu-item>
+            <mat-icon fontIcon="account_box"></mat-icon> Profile
+          </button>
+          <button mat-menu-item>
+            <mat-icon fontIcon="notifications_off"></mat-icon> Disable
+            notifications
+          </button>
+          <button mat-menu-item>
+            <mat-icon fontIcon="exit_to_app"></mat-icon> Sign Out
+          </button>
+        </mat-menu>
+      </div>
+    </mat-sidenav>
+    <mat-sidenav-content class="page-wrapper">
+      <div class="page-content">
+        <router-outlet><app-spinner></app-spinner></router-outlet>
+      </div>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div> -->

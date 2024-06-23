@@ -1,0 +1,104 @@
+<h2 class="auth-page-title">CREATE AN ACCOUNT</h2>
+<p>Fill in the below form to create your account with us.</p>
+<form
+  class="auth-form"
+  [formGroup]="form"
+  (ngSubmit)="submit()"
+  autocomplete="off"
+>
+  <p>
+    <mat-form-field appearance="outline">
+      <mat-label>First Name</mat-label>
+      <input
+        type="text"
+        matInput
+        placeholder="First Name"
+        formControlName="firstName"
+      />
+      @if (form.get('firstName')?.hasError('required')) {
+      <mat-error>First Name is <strong>required</strong></mat-error>
+      }
+    </mat-form-field>
+  </p>
+  <p>
+    <mat-form-field appearance="outline">
+      <mat-label>Last Name</mat-label>
+      <input
+        type="text"
+        matInput
+        placeholder="Last Name"
+        formControlName="lastName"
+      />
+      @if (form.get('lastName')?.hasError('required')) {
+      <mat-error>Last Name is <strong>required</strong></mat-error>
+      }
+    </mat-form-field>
+  </p>
+  <p>
+    <mat-form-field appearance="outline">
+      <mat-label>Username</mat-label>
+      <input
+        type="text"
+        matInput
+        placeholder="Username"
+        formControlName="username"
+      />
+      @if (form.get('username')?.hasError('required')) {
+      <mat-error>Username is <strong>required</strong></mat-error>
+      }
+    </mat-form-field>
+  </p>
+
+  <p>
+    <mat-form-field appearance="outline">
+      <mat-label>Password</mat-label>
+      <input
+        type="password"
+        matInput
+        placeholder="Password"
+        formControlName="password"
+      />
+      @if (form.get('password')?.hasError('required')) {
+      <mat-error>Password is <strong>required</strong></mat-error>
+      }
+    </mat-form-field>
+  </p>
+
+  <p>
+    <mat-form-field appearance="outline">
+      <mat-label>Confirm Password</mat-label>
+      <input
+        type="password"
+        matInput
+        placeholder="Confirm Password"
+        formControlName="confirmPassword"
+      />
+      @if (form.get('confirmPassword')?.hasError('required')) {
+      <mat-error>Confirm password is <strong>required</strong></mat-error>
+      }
+    </mat-form-field>
+  </p>
+  <p class="remember-me-section">
+    <mat-checkbox
+      >I agree to the
+      <a [routerLink]="['/']">terms and conditions</a></mat-checkbox
+    >
+  </p>
+  <p *ngIf="error" class="error">
+    {{ error }}
+  </p>
+
+  <div class="button">
+    <button
+      [routerLink]="['/app/dashboard']"
+      type="submit"
+      mat-stroked-button
+      extended
+    >
+      Register
+    </button>
+  </div>
+  <p class="create-account-link">
+    <a mat-button [routerLink]="['/auth/login']">SIGN IN</a>
+  </p>
+</form>
