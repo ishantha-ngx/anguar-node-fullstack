@@ -1,36 +1,42 @@
-<div>
-  <!-- Header -->
-  <mat-toolbar>
-    <span>My Fullstack Application</span>
-    <span class="header-spacer"></span>
-    <span
-      class="header-menu-item"
-      [routerLink]="['/']"
-      [routerLinkActiveOptions]="{ exact: true }"
-      routerLinkActive="router-link-active"
-      >Home</span
-    >
-    <span
-      class="header-menu-item"
-      [routerLink]="['/about-us']"
-      routerLinkActive="router-link-active"
-      >About Us</span
-    >
-    <span
-      class="header-menu-item"
-      [routerLink]="['/auth/login']"
-      routerLinkActive="router-link-active"
-      >Login</span
-    >
-    <span
-      class="header-menu-item"
-      [routerLink]="['/auth/register']"
-      routerLinkActive="router-link-active"
-      >Register</span
-    >
-  </mat-toolbar>
-
-  <div class="page-content">
-    <router-outlet />
+<nav>
+  <div class="menu">
+    <div class="logo">
+      <a [routerLink]="['/']">Fullstack App</a>
+    </div>
+    <ul>
+      <li>
+        <a
+          [routerLink]="['/']"
+          [routerLinkActiveOptions]="{ exact: true }"
+          routerLinkActive="router-link-active"
+          >Home</a
+        >
+      </li>
+      <li>
+        <a
+          [routerLink]="['/about-us']"
+          [routerLinkActiveOptions]="{ exact: true }"
+          routerLinkActive="router-link-active"
+          >About Us</a
+        >
+      </li>
+      <li>
+        <a
+          [routerLink]="['/auth/login']"
+          [routerLinkActiveOptions]="{ exact: true }"
+          routerLinkActive="router-link-active"
+          >Login</a
+        >
+      </li>
+      <li>
+        <a
+          [routerLink]="['/auth/register']"
+          [routerLinkActiveOptions]="{ exact: true }"
+          routerLinkActive="router-link-active"
+          >Register</a
+        >
+      </li>
+    </ul>
   </div>
-</div>
+</nav>
+<router-outlet></router-outlet>
