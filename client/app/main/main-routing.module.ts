@@ -9,6 +9,11 @@ const routes: Routes = [
         (component) => component.DashboardComponent
       ),
   },
+  {
+    path: '**',
+    pathMatch: 'full',
+    redirectTo: 'dashboard',
+  },
 ];
 
 @NgModule({
