@@ -3,9 +3,9 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "node dist/server/app.js",
-    "build": "ng build && tsc -p server",
-    "dev": "concurrently \"ng serve --open\" \"npx nodemon\"",
+    "start": "node init && node dist/server/app.js",
+    "build": "node init && ng build && tsc -p server",
+    "dev": "node init && concurrently \"ng serve --open\" \"npx nodemon\"",
     "prod": "concurrently \"ng build && tsc -p server && node dist/server/app.js\"",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
